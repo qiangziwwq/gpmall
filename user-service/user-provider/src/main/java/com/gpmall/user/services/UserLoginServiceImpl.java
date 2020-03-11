@@ -5,9 +5,6 @@ import com.gpmall.user.IUserLoginService;
 import com.gpmall.user.constants.SysRetCodeConstants;
 import com.gpmall.user.converter.UserConverterMapper;
 import com.gpmall.user.dal.entitys.Member;
-import com.gpmall.user.dal.entitys.MemberExample;
-import com.gpmall.user.dal.entitys.User;
-import com.gpmall.user.dal.entitys.UserExample;
 import com.gpmall.user.dal.persistence.MemberMapper;
 import com.gpmall.user.dal.persistence.UserMapper;
 import com.gpmall.user.dto.CheckAuthRequest;
@@ -19,9 +16,9 @@ import com.gpmall.user.utils.JwtTokenUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.annotation.Service;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,13 +45,17 @@ public class UserLoginServiceImpl implements IUserLoginService {
         UserLoginResponse response=new UserLoginResponse();
         try {
             request.requestCheck();
-            MemberExample memberExample = new MemberExample();
-            MemberExample.Criteria criteria = memberExample.createCriteria();
-            criteria.andStateEqualTo(1);
-            criteria.andUsernameEqualTo(request.getUserName());
+            Example example = new Example(Member.class);
+            example.createCriteria().andEqualTo("state",1).andEqualTo("username",request.getUserName());
 
-            List<Member> member = memberMapper.selectByExample(memberExample);
+            List<Member> member = memberMapper.selectByExample(example);
             if(member==null||member.size()==0) {
+                response.setCode(SysRetCodeConstants.USERORPASSWORD_ERRROR.getCode());
+                response.setMsg(SysRetCodeConstants.USERORPASSWORD_ERRROR.getMessage());
+                return response;
+            }
+            //验证是否已经激活
+            if("N".equals(member.get(0).getIsVerified())){
                 response.setCode(SysRetCodeConstants.USERORPASSWORD_ERRROR.getCode());
                 response.setMsg(SysRetCodeConstants.USERORPASSWORD_ERRROR.getMessage());
                 return response;
@@ -66,6 +67,7 @@ public class UserLoginServiceImpl implements IUserLoginService {
             }
             Map<String,Object> map=new HashMap<>();
             map.put("uid",member.get(0).getId());
+            map.put("file",member.get(0).getFile());
 
             String token=JwtTokenUtils.builder().msg(JSON.toJSON(map).toString()).build().creatJwtToken();
             response=UserConverterMapper.INSTANCE.converter(member.get(0));

@@ -1,10 +1,16 @@
 package com.gpmall.shopping.dal.entitys;
 
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
+@Table(name = "tb_item")
 public class Item implements Serializable {
+
+    @Id
     private Long id;
 
     private String title;
@@ -27,6 +33,7 @@ public class Item implements Serializable {
 
     private Date updated;
 
+    @Transient
     private String imageBig;
 
     private static final long serialVersionUID = 1L;

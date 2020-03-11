@@ -4,22 +4,38 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-
   <groupId>com.gpmall.parent</groupId>
   <artifactId>gpmall-parent</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>gpmall-parent</name>
 
+  <modules>
+    <module>../gpmall-commons</module>
+    <module>../comment-service</module>
+    <module>../coupon-service</module>
+    <module>../gpmall-cashier</module>
+    <module>../gpmall-shopping</module>
+    <module>../gpmall-user</module>
+    <module>../market-service</module>
+    <module>../order-services</module>
+    <module>../pay-service</module>
+    <module>../search-service</module>
+    <module>../shopping-service</module>
+    <module>../user-service</module>
+  </modules>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <spring-boot.version>2.1.6.RELEASE</spring-boot.version>
-    <dubbo.version>2.7.2</dubbo.version>
-    <dubbo-spring-boot.version>2.7.1</dubbo-spring-boot.version>
+    <dubbo.version>2.7.3</dubbo.version>
+    <dubbo-spring-boot.version>2.7.3</dubbo-spring-boot.version>
     <curator.famework.version>4.2.0</curator.famework.version>
     <mybatis.version>2.1.0</mybatis.version>
+    <tkmybatis.version>3.4.2</tkmybatis.version>
+    <tkmybatis.springboot.version>2.1.5</tkmybatis.springboot.version>
     <druid.version>1.1.19</druid.version>
     <gpmall.commons>1.0-SNAPSHOT</gpmall.commons>
     <mapstruct.version>1.3.0.Final</mapstruct.version>
@@ -29,9 +45,25 @@
     <joda-time.version>2.10.3</joda-time.version>
     <redisson.version>3.11.1</redisson.version>
     <pagehelper.version>5.1.10</pagehelper.version>
-    <pagehelper.sprinboo.version>1.2.12</pagehelper.sprinboo.version>
+    <pagehelper.sprinboot.version>1.2.12</pagehelper.sprinboot.version>
     <swagger-starter.version>1.8.0.RELEASE</swagger-starter.version>
+    <validation-api.version>2.0.1.Final</validation-api.version>
+    <hibernate-validator.version>6.0.17.Final</hibernate-validator.version>
+    <javax.mail.version>1.6.2</javax.mail.version>
   </properties>
+
+  <distributionManagement>
+    <repository>
+      <id>maven-release</id>
+      <name>Nexus Release Repository</name>
+      <url>http://maven.igper.com/repository/maven-releases/</url>
+    </repository>
+    <snapshotRepository>
+      <id>maven-snapshots</id>
+      <name>Nexus Snapshot Repository</name>
+      <url>http://maven.igper.com/repository/maven-snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
 
   <dependencyManagement>
     <dependencies>
@@ -119,6 +151,17 @@
         </exclusions>
       </dependency>
       <dependency>
+        <groupId>tk.mybatis</groupId>
+        <artifactId>mapper</artifactId>
+        <version>${tkmybatis.version}</version>
+      </dependency>
+      <!--mapper-->
+      <dependency>
+        <groupId>tk.mybatis</groupId>
+        <artifactId>mapper-spring-boot-starter</artifactId>
+        <version>${tkmybatis.springboot.version}</version>
+      </dependency>
+      <dependency>
         <groupId>com.alibaba</groupId>
         <artifactId>druid</artifactId>
         <version>${druid.version}</version>
@@ -162,12 +205,12 @@
       <dependency>
         <groupId>com.github.pagehelper</groupId>
         <artifactId>pagehelper-spring-boot-autoconfigure</artifactId>
-        <version>${pagehelper.sprinboo.version}</version>
+        <version>${pagehelper.sprinboot.version}</version>
       </dependency>
       <dependency>
         <groupId>com.github.pagehelper</groupId>
         <artifactId>pagehelper-spring-boot-starter</artifactId>
-        <version>${pagehelper.sprinboo.version}</version>
+        <version>${pagehelper.sprinboot.version}</version>
       </dependency>
       <!--swagger在线文档工具-->
       <dependency>
@@ -175,12 +218,46 @@
         <artifactId>swagger-spring-boot-starter</artifactId>
         <version>${swagger-starter.version}</version>
       </dependency>
+      <dependency>
+        <groupId>javax.validation</groupId>
+        <artifactId>validation-api</artifactId>
+        <version>${validation-api.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.hibernate.validator</groupId>
+        <artifactId>hibernate-validator</artifactId>
+        <version>${hibernate-validator.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.curator</groupId>
+        <artifactId>curator-framework</artifactId>
+        <version>${curator.famework.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.curator</groupId>
+        <artifactId>curator-recipes</artifactId>
+        <version>${curator.famework.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-actuator</artifactId>
+        <version>${spring-boot.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.mail</groupId>
+        <artifactId>javax.mail-api</artifactId>
+        <version>${javax.mail.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.mail</groupId>
+        <artifactId>javax.mail</artifactId>
+        <version>${javax.mail.version}</version>
+      </dependency>
     </dependencies>
-
   </dependencyManagement>
-  <dependencies>
-
-  </dependencies>
   <build>
     <pluginManagement>
       <plugins>
@@ -192,18 +269,24 @@
         <plugin>
           <groupId>org.mybatis.generator</groupId>
           <artifactId>mybatis-generator-maven-plugin</artifactId>
-          <version>1.3.5</version>
+          <version>1.3.7</version>
           <dependencies>
             <dependency>
-              <groupId> mysql</groupId>
-              <artifactId> mysql-connector-java</artifactId>
+              <groupId>mysql</groupId>
+              <artifactId>mysql-connector-java</artifactId>
               <version>8.0.16</version>
             </dependency>
             <dependency>
               <groupId>org.mybatis.generator</groupId>
               <artifactId>mybatis-generator-core</artifactId>
-              <version>1.3.5</version>
+              <version>1.3.7</version>
             </dependency>
+            <dependency>
+              <groupId>tk.mybatis</groupId>
+              <artifactId>mapper</artifactId>
+              <version>${tkmybatis.version}</version>
+            </dependency>
+
           </dependencies>
           <executions>
             <execution>
